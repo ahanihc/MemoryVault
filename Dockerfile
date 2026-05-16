@@ -12,7 +12,7 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 
 COPY --from=build /app/target/memoryvault.war /usr/local/tomcat/webapps/ROOT.war
 
-COPY --from=build /app/target/memoryvault/WEB-INF/lib/mysql-connector-j-8.0.33.jar /usr/local/tomcat/lib/mysql-connector-j-8.0.33.jar
+COPY --from=build /app/target/memoryvault/WEB-INF/lib/*.jar /usr/local/tomcat/lib/
 
 EXPOSE 8080
 
