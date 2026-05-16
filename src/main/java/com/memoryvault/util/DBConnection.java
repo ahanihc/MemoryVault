@@ -22,15 +22,23 @@ public class DBConnection {
                 password = "Ganavi2006#";
             }
 
+            host = host.trim();
+            port = port.trim();
+            database = database.trim();
+            username = username.trim();
+            password = password.trim();
+
             MysqlDataSource dataSource = new MysqlDataSource();
 
-            dataSource.setURL(
-                "jdbc:mysql://" + host + ":" + port + "/" + database
-                + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
-            );
-
+            dataSource.setServerName(host);
+            dataSource.setPortNumber(Integer.parseInt(port));
+            dataSource.setDatabaseName(database);
             dataSource.setUser(username);
             dataSource.setPassword(password);
+
+            dataSource.setUseSSL(false);
+            dataSource.setAllowPublicKeyRetrieval(true);
+            dataSource.setServerTimezone("UTC");
 
             return dataSource.getConnection();
 
