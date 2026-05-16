@@ -1,7 +1,7 @@
 package com.memoryvault.util;
 
 import java.sql.Connection;
-import com.mysql.cj.jdbc.MysqlDataSource;
+import java.util.Properties;
 
 public class DBConnection {
 
@@ -22,25 +22,20 @@ public class DBConnection {
                 password = "Ganavi2006#";
             }
 
-            host = host.trim();
+            host = host.replace("jdbc:mysql://", "").trim();
             port = port.trim();
             database = database.trim();
             username = username.trim();
             password = password.trim();
 
-            MysqlDataSource dataSource = new MysqlDataSource();
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + database
+                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-            dataSource.setServerName(host);
-            dataSource.setPortNumber(Integer.parseInt(port));
-            dataSource.setDatabaseName(database);
-            dataSource.setUser(username);
-            dataSource.setPassword(password);
+            Properties props = new Properties();
+            props.setProperty("user", username);
+            props.setProperty("password", password);
 
-            dataSource.setUseSSL(false);
-            dataSource.setAllowPublicKeyRetrieval(true);
-            dataSource.setServerTimezone("UTC");
-
-            return dataSource.getConnection();
+            return new com.mysql.cj.jdbc.Driver().connect(url, props);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -40,7 +40,7 @@
         <div class="hero-text">
 
             <h2>
-                Your Future Self Awaits &#127800;
+                Your Future Self Awaits;
             </h2>
 
             <p>
