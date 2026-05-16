@@ -7,7 +7,10 @@ public class DBConnection {
 
     public static Connection getConnection() {
 
+        Connection connection = null;
+
         try {
+
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String host = System.getenv("MYSQLHOST");
@@ -16,14 +19,19 @@ public class DBConnection {
             String username = System.getenv("MYSQLUSER");
             String password = System.getenv("MYSQLPASSWORD");
 
-            String url = "jdbc:mysql://" + host + ":" + port + "/" + database
-                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            String url =
+                "jdbc:mysql://" + host + ":" + port + "/" + database +
+                "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-            return DriverManager.getConnection(url, username, password);
+            connection =
+                DriverManager.getConnection(url, username, password);
+
+            System.out.println("Database connected successfully!");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+
+        return connection;
     }
 }
