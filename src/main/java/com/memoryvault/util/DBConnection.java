@@ -1,15 +1,13 @@
 package com.memoryvault.util;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import com.mysql.cj.jdbc.MysqlDataSource;
 
 public class DBConnection {
 
     public static Connection getConnection() {
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
             String host = System.getenv("MYSQLHOST");
             String port = System.getenv("MYSQLPORT");
             String database = System.getenv("MYSQLDATABASE");
@@ -24,10 +22,17 @@ public class DBConnection {
                 password = "Ganavi2006#";
             }
 
-            String url = "jdbc:mysql://" + host + ":" + port + "/" + database
-                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            MysqlDataSource dataSource = new MysqlDataSource();
 
-            return DriverManager.getConnection(url, username, password);
+            dataSource.setURL(
+                "jdbc:mysql://" + host + ":" + port + "/" + database
+                + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            );
+
+            dataSource.setUser(username);
+            dataSource.setPassword(password);
+
+            return dataSource.getConnection();
 
         } catch (Exception e) {
             e.printStackTrace();
