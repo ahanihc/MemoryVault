@@ -5,16 +5,26 @@ import java.sql.DriverManager;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/memoryvault_db";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "Ganavi2006#";
-
     public static Connection getConnection() {
+
         Connection connection = null;
 
         try {
+
             Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+            String host = System.getenv("MYSQLHOST");
+            String port = System.getenv("MYSQLPORT");
+            String database = System.getenv("MYSQLDATABASE");
+            String username = System.getenv("MYSQLUSER");
+            String password = System.getenv("MYSQLPASSWORD");
+
+            String url =
+                "jdbc:mysql://" + host + ":" + port + "/" + database;
+
+            connection =
+                DriverManager.getConnection(url, username, password);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
