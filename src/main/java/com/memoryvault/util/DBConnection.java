@@ -7,10 +7,7 @@ public class DBConnection {
 
     public static Connection getConnection() {
 
-        Connection connection = null;
-
         try {
-
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String host = System.getenv("MYSQLHOST");
@@ -19,19 +16,22 @@ public class DBConnection {
             String username = System.getenv("MYSQLUSER");
             String password = System.getenv("MYSQLPASSWORD");
 
-            String url =
-                "jdbc:mysql://" + host + ":" + port + "/" + database +
-                "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            if (host == null || port == null || database == null || username == null || password == null) {
+                host = "localhost";
+                port = "3306";
+                database = "memoryvault_db";
+                username = "root";
+                password = "Ganavi2006#";
+            }
 
-            connection =
-                DriverManager.getConnection(url, username, password);
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + database
+                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-            System.out.println("Database connected successfully!");
+            return DriverManager.getConnection(url, username, password);
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-
-        return connection;
     }
 }
