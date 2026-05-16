@@ -27,6 +27,10 @@ public class CapsuleUnlockScheduler {
 
         try {
             Connection con = DBConnection.getConnection();
+            if (con == null) {
+            System.out.println("Database connection failed. Scheduler skipped.");
+         return;
+        }
 
             String sql =
                     "SELECT c.capsule_id, c.title, c.created_at, u.name, u.email " +
