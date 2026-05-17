@@ -10,34 +10,37 @@ import java.util.List;
 public class CapsuleDAO {
 
     public int createCapsule(Capsule capsule) {
-        int capsuleId = 0;
+    int capsuleId = 0;
 
-        String sql = "INSERT INTO capsules(user_id, title, secret_letter, unlock_date, capsule_type) VALUES (?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO capsules(user_id, title, secret_letter, unlock_date, capsule_type, is_unlocked, email_sent) " +
+                 "VALUES (?, ?, ?, ?, ?, FALSE, FALSE)";
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    try (Connection con = DBConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, capsule.getUserId());
-            ps.setString(2, capsule.getTitle());
-            ps.setString(3, capsule.getSecretLetter());
-            ps.setString(4, capsule.getUnlockDate());
-            ps.setString(5, capsule.getCapsuleType());
+        ps.setInt(1, capsule.getUserId());
+        ps.setString(2, capsule.getTitle());
+        ps.setString(3, capsule.getSecretLetter());
+        ps.setString(4, capsule.getUnlockDate());
+        ps.setString(5, capsule.getCapsuleType());
 
-            ps.executeUpdate();
+        int rows = ps.executeUpdate();
+        System.out.println("Capsule insert rows: " + rows);
 
-            ResultSet rs = ps.getGeneratedKeys();
+        ResultSet rs = ps.getGeneratedKeys();
 
-            if (rs.next()) {
-                capsuleId = rs.getInt(1);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (rs.next()) {
+            capsuleId = rs.getInt(1);
+            System.out.println("Created capsule ID: " + capsuleId);
         }
 
-        return capsuleId;
+    } catch (Exception e) {
+        System.out.println("Capsule creation failed in DAO");
+        e.printStackTrace();
     }
 
+    return capsuleId;
+}
     public List<Capsule> getCapsulesByUser(int userId) {
         List<Capsule> capsules = new ArrayList<>();
 
