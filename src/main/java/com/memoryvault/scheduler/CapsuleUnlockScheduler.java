@@ -1,7 +1,6 @@
 package com.memoryvault.scheduler;
 
 import com.memoryvault.util.DBConnection;
-import com.memoryvault.util.EmailUtility;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +15,7 @@ public class CapsuleUnlockScheduler {
             while (true) {
 
                 try {
+
                     Connection con = DBConnection.getConnection();
 
                     if (con == null) {
@@ -25,51 +25,34 @@ public class CapsuleUnlockScheduler {
                     }
 
                     String sql =
-                            "SELECT c.capsule_id, c.title, u.email " +
-                            "FROM capsules c " +
-                            "JOIN users u ON c.user_id = u.user_id " +
-                            "WHERE c.unlock_date <= DATE_ADD(NOW(), INTERVAL 330 MINUTE) " +
-                            "AND c.email_sent = FALSE";
+                            "SELECT capsule_id " +
+                            "FROM capsules " +
+                            "WHERE unlock_date <= DATE_ADD(NOW(), INTERVAL 330 MINUTE) " +
+                            "AND is_unlocked = FALSE";
 
                     PreparedStatement ps = con.prepareStatement(sql);
+
                     ResultSet rs = ps.executeQuery();
 
                     while (rs.next()) {
 
                         int capsuleId = rs.getInt("capsule_id");
-                        String title = rs.getString("title");
-                        String email = rs.getString("email");
 
-                        boolean emailSent = EmailUtility.sendUnlockEmail(email, title);
+                        String updateSql =
+                                "UPDATE capsules " +
+                                "SET is_unlocked = TRUE " +
+                                "WHERE capsule_id=?";
 
-                        if (emailSent) {
+                        PreparedStatement updatePs =
+                                con.prepareStatement(updateSql);
 
-                            String updateSql =
-                                    "UPDATE capsules " +
-                                    "SET is_unlocked = TRUE, email_sent = TRUE " +
-                                    "WHERE capsule_id=?";
+                        updatePs.setInt(1, capsuleId);
 
-                            PreparedStatement updatePs = con.prepareStatement(updateSql);
-                            updatePs.setInt(1, capsuleId);
-                            updatePs.executeUpdate();
-                            updatePs.close();
+                        updatePs.executeUpdate();
 
-                            System.out.println("Capsule unlocked and email sent: " + capsuleId);
+                        updatePs.close();
 
-                        } else {
-
-                            String updateSql =
-                                    "UPDATE capsules " +
-                                    "SET is_unlocked = TRUE " +
-                                    "WHERE capsule_id=?";
-
-                            PreparedStatement updatePs = con.prepareStatement(updateSql);
-                            updatePs.setInt(1, capsuleId);
-                            updatePs.executeUpdate();
-                            updatePs.close();
-
-                            System.out.println("Capsule unlocked but email failed: " + capsuleId);
-                        }
+                        System.out.println("Capsule unlocked: " + capsuleId);
                     }
 
                     rs.close();
