@@ -192,10 +192,7 @@
                 <span>03</span>
 
                 <h3>Get Notified</h3>
-
-                <p>
-                    Receive an email when your capsule is ready.
-                </p>
+                    <p>Receive an in-app popup notification when your capsule is ready to unlock.</p>
 
             </div>
 
