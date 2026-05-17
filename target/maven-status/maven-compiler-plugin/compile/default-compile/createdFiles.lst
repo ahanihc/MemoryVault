@@ -1,0 +1,17 @@
+com\memoryvault\util\DBConnection.class
+com\memoryvault\util\EmailUtility.class
+com\memoryvault\util\EmailUtility$1.class
+com\memoryvault\servlet\LogoutServlet.class
+com\memoryvault\dao\CapsuleDAO.class
+com\memoryvault\servlet\ViewCapsuleServlet.class
+com\memoryvault\servlet\RegisterServlet.class
+com\memoryvault\servlet\LoginServlet.class
+com\memoryvault\servlet\DownloadMediaServlet.class
+com\memoryvault\servlet\CreateCapsuleServlet.class
+com\memoryvault\dao\UserDAO.class
+com\memoryvault\model\User.class
+com\memoryvault\model\Capsule.class
+com\memoryvault\dao\MediaDAO.class
+com\memoryvault\scheduler\CapsuleUnlockScheduler.class
+com\memoryvault\listener\AppStartupListener.class
+com\memoryvault\model\MediaFile.class
