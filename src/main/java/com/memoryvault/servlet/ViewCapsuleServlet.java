@@ -16,44 +16,54 @@ import java.util.List;
 @WebServlet("/viewCapsule")
 public class ViewCapsuleServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
+        try {
+            HttpSession session = request.getSession(false);
 
-        User user = (User) session.getAttribute("user");
+            if (session == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
 
-        if (user == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+            User user = (User) session.getAttribute("user");
 
-        int capsuleId = Integer.parseInt(request.getParameter("id"));
+            if (user == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
 
-        CapsuleDAO capsuleDAO = new CapsuleDAO();
-        capsuleDAO.updateUnlockStatus(capsuleId);
+            int capsuleId = Integer.parseInt(request.getParameter("id"));
 
-        Capsule capsule = capsuleDAO.getCapsuleById(capsuleId, user.getUserId());
+            CapsuleDAO capsuleDAO = new CapsuleDAO();
 
-        if (capsule == null) {
-            response.sendRedirect("dashboard.jsp?notfound=1");
-            return;
-        }
+            // This checks DB time and unlocks if unlock_date <= NOW()
+            capsuleDAO.updateUnlockStatus(capsuleId);
 
-        if (!capsule.isUnlocked()) {
+            // Fetch capsule again after updating unlock status
+            Capsule capsule = capsuleDAO.getCapsuleById(capsuleId, user.getUserId());
+
+            if (capsule == null) {
+                response.sendRedirect("dashboard.jsp");
+                return;
+            }
+
+            boolean locked = !capsule.isUnlocked();
+
+            MediaDAO mediaDAO = new MediaDAO();
+            List<MediaFile> mediaFiles = mediaDAO.getMediaByCapsule(capsuleId);
+
             request.setAttribute("capsule", capsule);
-            request.setAttribute("locked", true);
+            request.setAttribute("locked", locked);
+            request.setAttribute("mediaFiles", mediaFiles);
+
             request.getRequestDispatcher("viewCapsule.jsp").forward(request, response);
-            return;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("dashboard.jsp");
         }
-
-        MediaDAO mediaDAO = new MediaDAO();
-        List<MediaFile> mediaFiles = mediaDAO.getMediaByCapsule(capsuleId);
-
-        request.setAttribute("capsule", capsule);
-        request.setAttribute("mediaFiles", mediaFiles);
-        request.setAttribute("locked", false);
-
-        request.getRequestDispatcher("viewCapsule.jsp").forward(request, response);
     }
 }
