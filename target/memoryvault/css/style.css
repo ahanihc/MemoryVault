@@ -418,4 +418,65 @@ body {
     .auth-card {
         padding: 30px;
     }
+.unlock-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(47, 62, 53, 0.38);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(7px);
+}
+
+.unlock-popup-card {
+    background: #fff7ea;
+    padding: 38px;
+    max-width: 440px;
+    width: 90%;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 22px 48px rgba(80, 60, 40, 0.2);
+    animation: popupScale 0.35s ease;
+}
+
+.unlock-popup-card h2 {
+    color: #3f6f5a;
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.unlock-popup-card p {
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.popup-capsule-list {
+    background: #ffffff;
+    padding: 14px;
+    border-radius: 18px;
+    margin: 18px 0;
+}
+
+.popup-close-btn {
+    display: block;
+    margin: 18px auto 0;
+    border: none;
+    background: transparent;
+    color: #3f6f5a;
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+@keyframes popupScale {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
