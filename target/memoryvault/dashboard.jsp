@@ -138,7 +138,7 @@
 <footer class="home-footer">
 
     <p>
-        Made with &#127807; for future memories — MemoryVault
+        Turning moments into future nostalgia— MemoryVault
     </p>
 
 </footer>

@@ -19,7 +19,7 @@ public class CapsuleUnlockScheduler {
                     Connection con = DBConnection.getConnection();
 
                     if (con == null) {
-                        System.out.println("Database connection failed.");
+                        System.out.println("Database connection failed. Scheduler skipped.");
                         Thread.sleep(60000);
                         continue;
                     }
@@ -35,23 +35,45 @@ public class CapsuleUnlockScheduler {
                     ResultSet rs = ps.executeQuery();
 
                     while (rs.next()) {
+
                         int capsuleId = rs.getInt("capsule_id");
                         String title = rs.getString("title");
                         String email = rs.getString("email");
 
-                        String updateSql =
-                                "UPDATE capsules SET is_unlocked = TRUE, email_sent = TRUE " +
-                                "WHERE capsule_id=?";
+                        boolean emailSent = EmailUtility.sendUnlockEmail(email, title);
 
-                        PreparedStatement updatePs = con.prepareStatement(updateSql);
-                        updatePs.setInt(1, capsuleId);
-                        updatePs.executeUpdate();
+                        if (emailSent) {
 
-                        EmailUtility.sendUnlockEmail(email, title);
+                            String updateSql =
+                                    "UPDATE capsules " +
+                                    "SET is_unlocked = TRUE, email_sent = TRUE " +
+                                    "WHERE capsule_id=?";
 
-                        System.out.println("Capsule unlocked and email sent: " + capsuleId);
+                            PreparedStatement updatePs = con.prepareStatement(updateSql);
+                            updatePs.setInt(1, capsuleId);
+                            updatePs.executeUpdate();
+                            updatePs.close();
+
+                            System.out.println("Capsule unlocked and email sent: " + capsuleId);
+
+                        } else {
+
+                            String updateSql =
+                                    "UPDATE capsules " +
+                                    "SET is_unlocked = TRUE " +
+                                    "WHERE capsule_id=?";
+
+                            PreparedStatement updatePs = con.prepareStatement(updateSql);
+                            updatePs.setInt(1, capsuleId);
+                            updatePs.executeUpdate();
+                            updatePs.close();
+
+                            System.out.println("Capsule unlocked but email failed: " + capsuleId);
+                        }
                     }
 
+                    rs.close();
+                    ps.close();
                     con.close();
 
                     Thread.sleep(60000);
