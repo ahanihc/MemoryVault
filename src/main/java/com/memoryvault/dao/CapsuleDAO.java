@@ -12,12 +12,10 @@ public class CapsuleDAO {
     public int createCapsule(Capsule capsule) {
         int capsuleId = 0;
 
-        try {
-            Connection con = DBConnection.getConnection();
+        String sql = "INSERT INTO capsules(user_id, title, secret_letter, unlock_date, capsule_type) VALUES (?, ?, ?, ?, ?)";
 
-            String sql = "INSERT INTO capsules(user_id, title, secret_letter, unlock_date, capsule_type) VALUES (?, ?, ?, ?, ?)";
-
-            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, capsule.getUserId());
             ps.setString(2, capsule.getTitle());
@@ -43,12 +41,13 @@ public class CapsuleDAO {
     public List<Capsule> getCapsulesByUser(int userId) {
         List<Capsule> capsules = new ArrayList<>();
 
-        try {
-            Connection con = DBConnection.getConnection();
+        String sql =
+                "SELECT *, IF(unlock_date <= DATE_ADD(NOW(), INTERVAL 5 HOUR 30 MINUTE), TRUE, FALSE) AS unlocked_status " +
+                "FROM capsules WHERE user_id=? ORDER BY created_at DESC";
 
-            String sql = "SELECT *, IF(unlock_date <= NOW(), TRUE, FALSE) AS unlocked_status FROM capsules WHERE user_id=? ORDER BY created_at DESC";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, userId);
 
             ResultSet rs = ps.executeQuery();
@@ -77,12 +76,13 @@ public class CapsuleDAO {
     public Capsule getCapsuleById(int capsuleId, int userId) {
         Capsule capsule = null;
 
-        try {
-            Connection con = DBConnection.getConnection();
+        String sql =
+                "SELECT *, IF(unlock_date <= DATE_ADD(NOW(), INTERVAL 5 HOUR 30 MINUTE), TRUE, FALSE) AS unlocked_status " +
+                "FROM capsules WHERE capsule_id=? AND user_id=?";
 
-            String sql = "SELECT *, IF(unlock_date <= NOW(), TRUE, FALSE) AS unlocked_status FROM capsules WHERE capsule_id=? AND user_id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, capsuleId);
             ps.setInt(2, userId);
 
@@ -107,18 +107,21 @@ public class CapsuleDAO {
         return capsule;
     }
 
-    public void updateUnlockStatus(int capsuleId) {
-        try {
-            Connection con = DBConnection.getConnection();
+    public boolean updateUnlockStatus(int capsuleId) {
+        String sql =
+                "UPDATE capsules SET is_unlocked = TRUE " +
+                "WHERE capsule_id=? AND unlock_date <= DATE_ADD(NOW(), INTERVAL 5 HOUR 30 MINUTE)";
 
-            String sql = "UPDATE capsules SET is_unlocked = TRUE WHERE capsule_id=? AND unlock_date <= NOW()";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, capsuleId);
-            ps.executeUpdate();
+
+            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

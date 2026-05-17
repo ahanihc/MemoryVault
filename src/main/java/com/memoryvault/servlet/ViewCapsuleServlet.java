@@ -39,10 +39,8 @@ public class ViewCapsuleServlet extends HttpServlet {
 
             CapsuleDAO capsuleDAO = new CapsuleDAO();
 
-            // This checks DB time and unlocks if unlock_date <= NOW()
             capsuleDAO.updateUnlockStatus(capsuleId);
 
-            // Fetch capsule again after updating unlock status
             Capsule capsule = capsuleDAO.getCapsuleById(capsuleId, user.getUserId());
 
             if (capsule == null) {
